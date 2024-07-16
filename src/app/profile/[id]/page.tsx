@@ -15,7 +15,7 @@ const ProfilePage = () => {
         </div>
       </div>
       <div className="hidden lg:block w-[30%]">
-        <RightMenu />
+        <RightMenu userId="test" />
       </div>
     </div>
   )
