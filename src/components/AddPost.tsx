@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import Image from "next/image"
 import { useState } from "react";
 import AddPostButton from "./AddPostButton";
+import { addPost } from "@/lib/actions";
 
 const AddPost = () => {
 
@@ -31,7 +32,10 @@ const AddPost = () => {
       <div className="flex-1">
         
         {/* TEXT INPUT */}
-        <form className="flex gap-4">
+        <form 
+          action={(formData) => addPost(formData, img?.secure_url || "")}
+          className="flex gap-4"
+        >
           <textarea
             placeholder="What's on your mind?"
             className="flex-1 bg-slate-100 rounded-lg p-2"
