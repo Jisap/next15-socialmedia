@@ -30,7 +30,7 @@ const UserInfoCardInteraction = ({
         ...prev,
         following: prev.following && false,
         followingRequestSent:
-          !prev.following && !prev.followingRequestSent ? true : false,
+          !prev.following && !prev.followingRequestSent ? true : false,     // Se vuelve a actualizar el state 
       }));
     } catch (err) { }
   };
