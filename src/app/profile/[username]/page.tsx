@@ -33,7 +33,7 @@ const ProfilePage = async({ params }: { params: { username: string } }) => {
   let isBlocked;
 
   if (currentUserId) {                                            // Si existe el id del usuario logueado
-    const res = await prisma.block.findFirst({                    // buscamos en bd los usuario bloqueados contenidos en block[]
+    const res = await prisma.block.findFirst({                    // buscamos en bd los usuarios bloqueados contenidos en block[]
       where: {                                                    // Comprobamos si el usuario autenticado (currentUserId)
         blockerId: user.id,                                       // está bloqueado por el usuario cuyo perfil se está viendo (user.id)
         blockedId: currentUserId,

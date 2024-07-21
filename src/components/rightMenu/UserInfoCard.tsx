@@ -5,6 +5,8 @@ import { User } from '@prisma/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import UserInfoCardInteraction from './UserInfoCardInteraction'
+import UpdateUser from './UpdateUser'
+
 //import UserInfoCardInteraction from './UserInfoCardInteraction'
 
 const UserInfoCard = async({ user }:{ user:User }) => {             // Se recibe el objeto del usuario que se quiere ver la info
@@ -57,9 +59,13 @@ const UserInfoCard = async({ user }:{ user:User }) => {             // Se recibe
       {/* TOP */}
       <div className="flex justify-between items-center font-medium">
         <span className="text-gray-500">User Information</span>
-        <Link href="/" className="text-blue-500 text-xs">
-          See all
-        </Link>
+        {currentUserId === user.id ? (
+          <UpdateUser />
+        ) : (
+          <Link href="/" className="text-blue-500 text-xs">
+            See all
+          </Link>
+        )}
       </div>
 
       {/* BOTTOM */}

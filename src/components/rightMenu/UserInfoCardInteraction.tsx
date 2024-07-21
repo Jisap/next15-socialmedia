@@ -30,7 +30,7 @@ const UserInfoCardInteraction = ({
         ...prev,
         following: prev.following && false,
         followingRequestSent:
-          !prev.following && !prev.followingRequestSent ? true : false,     // Se vuelve a actualizar el state 
+          !prev.following && !prev.followingRequestSent ? true : false,     // Se vuelve a actualizar el state con la misma lógica del state optimistic pero esta vez en bd
       }));
     } catch (err) { }
   };
@@ -52,7 +52,7 @@ const UserInfoCardInteraction = ({
     (state, value: "follow" | "block") =>                                   // Función que define cómo actualizar el estado optimistamente
       value === "follow"                                                    // En el formulario recibiras un valor "follow" o "block" (switchOptimisticState)
         ? {                                                                 // Si es "follow"
-          ...state,                                                         // modificas el state del usuario
+          ...state,                                                         // spread el state del usuario
           following: state.following && false,                              // following: Se establece en false si ya está true
           followingRequestSent:                                             // followingRequestSent: Se establece en true solo si following es false y followingRequestSent también es false.    
             !state.following && !state.followingRequestSent ? true : false,

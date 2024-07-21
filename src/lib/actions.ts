@@ -123,32 +123,33 @@ export const switchBlock = async (userId: string) => {
   }
 };
 
-export const acceptFollowRequest = async (userId: string) => {
-  const { userId: currentUserId } = auth();
+export const acceptFollowRequest = async (userId: string) => {            // Fn para aceptar solicitudes de amistad de un usuario (userId)
+
+  const { userId: currentUserId } = auth();                               // usuario logueado renombrado a currentUserId
 
   if (!currentUserId) {
     throw new Error("User is not Authenticated!!");
   }
 
   try {
-    const existingFollowRequest = await prisma.followRequest.findFirst({
+    const existingFollowRequest = await prisma.followRequest.findFirst({  // 1º buscamos la petición existente de amistad en folloRequest
       where: {
-        senderId: userId,
-        receiverId: currentUserId,
+        senderId: userId,                                                 // enviadas por un usuario
+        receiverId: currentUserId,                                        // al usuario logueado
       },
     });
 
-    if (existingFollowRequest) {
-      await prisma.followRequest.delete({
+    if (existingFollowRequest) {                                          // si ya existía
+      await prisma.followRequest.delete({                                 // la borramos de la lista de peticiones de amistad
         where: {
           id: existingFollowRequest.id,
         },
       });
 
-      await prisma.follower.create({
-        data: {
-          followerId: userId,
-          followingId: currentUserId,
+      await prisma.follower.create({                                      // 2º creamos un seguidor
+        data: { 
+          followerId: userId,                                             // con el id del usuario que hizo la petición
+          followingId: currentUserId,                                     // para seguir al usuario logueado
         },
       });
     }
@@ -158,23 +159,24 @@ export const acceptFollowRequest = async (userId: string) => {
   }
 };
 
-export const declineFollowRequest = async (userId: string) => {
-  const { userId: currentUserId } = auth();
+export const declineFollowRequest = async (userId: string) => {           // Fn para rechazar solicitudes de amistad de un usuario (userId)
+
+  const { userId: currentUserId } = auth();                               // usuario logueado renombrado a currentUserId
 
   if (!currentUserId) {
     throw new Error("User is not Authenticated!!");
   }
 
   try {
-    const existingFollowRequest = await prisma.followRequest.findFirst({
+    const existingFollowRequest = await prisma.followRequest.findFirst({  // 1º buscamos la petición existente de amistad en folloRequest
       where: {
-        senderId: userId,
-        receiverId: currentUserId,
+        senderId: userId,                                                 // enviadas por un usuario
+        receiverId: currentUserId,                                        // al usuario logueado
       },
     });
 
-    if (existingFollowRequest) {
-      await prisma.followRequest.delete({
+    if (existingFollowRequest) {                                          // Si ya existía
+      await prisma.followRequest.delete({                                 // procedemos a borrarla
         where: {
           id: existingFollowRequest.id,
         },
