@@ -1,16 +1,18 @@
 "use client"
 
+import React, { useActionState, useState } from 'react'
 import { updateProfile } from '@/lib/actions';
 import { User } from '@prisma/client'
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useActionState, useState } from 'react'
+import { CldUploadWidget } from "next-cloudinary";
 
 const UpdateUser = ({ user }: { user: User }) => { // ProfilePage -> user -> RightMenu -> UserInfoCard -> info + updateUser component
 
   const [open, setOpen] = useState(false);
   const [cover, setCover] = useState<any>(false);
 
+  // formAction -> updateProfile
   const [state, formAction] = useActionState(updateProfile, { success: false, error: false });  // Actualiza el estado según el resultado de una acción de formulario.
 
   const router = useRouter();
@@ -31,29 +33,44 @@ const UpdateUser = ({ user }: { user: User }) => { // ProfilePage -> user -> Rig
       {open && (
         <div className="absolute w-screen h-screen top-0 left-0 bg-black bg-opacity-65 flex items-center justify-center z-50 ">
           <form
-            //action={(formData) => formAction({ formData, cover: cover?.secure_url || "" })}
+            action={(formData) => formAction({ formData, cover: cover?.secure_url || "" })} // formAction -> updateProfile( formData, cover )
             className="p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3 relative"
           >
             {/* TITLE */}
             <h1>Update Profile</h1>
             <div className='mt-4 text-xs text-gray-500'>
               Use the navbar profile to change the avatar or username.
-            </div>
+            </div>          
 
             {/* COVER PIC UPLOAD */}
-            <div className='flex flex-col gap-4 my-4'>
-              <label htmlFor="">Cover Picture</label>
-              <div className='flex items-center gap-2 cursor-pointer'>
-                <Image
-                  src={user.cover || "/noCover.png"}
-                  alt=""
-                  width={48}
-                  height={32}
-                  className='w-12 h-8 rounded-md object-cover'
-                />
-                <span className='text-xs underline text-gray-600'>Change</span>
-              </div>
-            </div>
+            <CldUploadWidget
+              uploadPreset="social"
+              // result.info contiene la imagen subida a cloudinary -> setCover(result.info) -> cover.secure.url contiene la url de la imagen en cloudinary
+              onSuccess={(result) => setCover(result.info)}
+            >
+              {({ open }) => {
+                return (
+                  <div
+                    className="flex flex-col gap-4 my-4"
+                    onClick={() => open()}
+                  >
+                    <label htmlFor="">Cover Picture</label>
+                    <div className="flex items-center gap-2 cursor-pointer">
+                      <Image
+                        src={user.cover || "/noCover.png"}
+                        alt=""
+                        width={48}
+                        height={32}
+                        className="w-12 h-8 rounded-md object-cover"
+                      />
+                      <span className="text-xs underline text-gray-600">
+                        Change
+                      </span>
+                    </div>
+                  </div>
+                );
+              }}
+            </CldUploadWidget>
 
             {/* WRAPPER */}
             <div className="flex flex-wrap justify-between gap-2 xl:gap-4">

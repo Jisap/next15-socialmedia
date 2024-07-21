@@ -190,7 +190,7 @@ export const declineFollowRequest = async (userId: string) => {           // Fn 
 
 export const updateProfile = async (
   prevState: { success: boolean; error: boolean },
-  payload: { formData: FormData; cover: string }                            // Data del formulario
+  payload: { formData: FormData; cover: string }                            // Data del formulario + cover
 ) => {
 
   const { formData, cover } = payload;                                      // Desestructuramos el cover
