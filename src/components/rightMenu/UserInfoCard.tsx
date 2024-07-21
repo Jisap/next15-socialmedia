@@ -7,9 +7,9 @@ import Link from 'next/link'
 import UserInfoCardInteraction from './UserInfoCardInteraction'
 import UpdateUser from './UpdateUser'
 
-//import UserInfoCardInteraction from './UserInfoCardInteraction'
 
-const UserInfoCard = async({ user }:{ user:User }) => {             // Se recibe el objeto del usuario que se quiere ver la info
+
+const UserInfoCard = async({ user }:{ user:User }) => {                   // Se recibe el objeto del usuario que se quiere ver la info
 
   const createdAtDate = new Date(user.createdAt);
 
@@ -19,35 +19,35 @@ const UserInfoCard = async({ user }:{ user:User }) => {             // Se recibe
     day: "numeric",
   });
 
-  let isUserBlocked = false;                                        // Inicializa las variables para verificar si el usuario está bloqueado, 
-  let isFollowing = false;                                          // seguido 
-  let isFollowingSent = false;                                      // o si la solicitud de seguimiento está enviada.
+  let isUserBlocked = false;                                              // Inicializa las variables para verificar si el usuario está bloqueado, 
+  let isFollowing = false;                                                // seguido 
+  let isFollowingSent = false;                                            // o si la solicitud de seguimiento está enviada.
 
-  const { userId: currentUserId } = auth();                         // Usuario logueado
+  const { userId: currentUserId } = auth();                               // Usuario logueado
  
   if (currentUserId) {
-    const blockRes = await prisma.block.findFirst({                 // Comprobamos 
+    const blockRes = await prisma.block.findFirst({                       // Comprobamos 
       where: {
-        blockerId: user.id,                                         // Si el usuario del perfil ha bloqueado
-        blockedId: currentUserId,                                   // al usuario autenticado
+        blockerId: user.id,                                               // Si el usuario del perfil ha bloqueado
+        blockedId: currentUserId,                                         // al usuario autenticado
       },
     });
 
-    blockRes ? (isUserBlocked = true) : (isUserBlocked = false);    // usuario autenticado bloqueado
+    blockRes ? (isUserBlocked = true) : (isUserBlocked = false);          // usuario autenticado bloqueado
 
-    const followRes = await prisma.follower.findFirst({             // Comprobamos
+    const followRes = await prisma.follower.findFirst({                   // Comprobamos
       where: {
-        followerId: currentUserId,                                  // si el usuario autenticado sigue
-        followingId: user.id,                                       // al usuario del perfil.
+        followerId: currentUserId,                                        // si el usuario autenticado sigue
+        followingId: user.id,                                             // al usuario del perfil.
       },
     });
 
-    followRes ? (isFollowing = true) : (isFollowing = false);       // Usuario autenticado sigue al usuario de perfil
+    followRes ? (isFollowing = true) : (isFollowing = false);             // Usuario autenticado sigue al usuario de perfil
 
-    const followReqRes = await prisma.followRequest.findFirst({     // Comprobamos 
+    const followReqRes = await prisma.followRequest.findFirst({           // Comprobamos 
       where: {
-        senderId: currentUserId,                                    // si hay una solicitud de seguimiento enviada por el usuario autenticado.
-        receiverId: user.id,                                        // al usuario de perfil
+        senderId: currentUserId,                                          // si hay una solicitud de seguimiento enviada por el usuario autenticado.
+        receiverId: user.id,                                              // al usuario de perfil
       },
     });
 
@@ -60,7 +60,7 @@ const UserInfoCard = async({ user }:{ user:User }) => {             // Se recibe
       <div className="flex justify-between items-center font-medium">
         <span className="text-gray-500">User Information</span>
         {currentUserId === user.id ? (
-          <UpdateUser />
+          <UpdateUser user={user} />
         ) : (
           <Link href="/" className="text-blue-500 text-xs">
             See all

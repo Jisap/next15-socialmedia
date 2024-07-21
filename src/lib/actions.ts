@@ -187,3 +187,53 @@ export const declineFollowRequest = async (userId: string) => {           // Fn 
     throw new Error("Something went wrong!");
   }
 };
+
+export const updateProfile = async (
+  prevState: { success: boolean; error: boolean },
+  payload: { formData: FormData; cover: string }                            // Data del formulario
+) => {
+
+  const { formData, cover } = payload;                                      // Desestructuramos el cover
+  const fields = Object.fromEntries(formData);                              // Object con el resto de campos
+
+  const filteredFields = Object.fromEntries(
+    Object.entries(fields).filter(([_, value]) => value !== "")             // Filtra los campos, eliminando aquellos cuyos valores sean cadenas vacías 
+  );
+
+  const Profile = z.object({                                                // Reglas de validación del formulario
+    cover: z.string().optional(),
+    name: z.string().max(60).optional(),
+    surname: z.string().max(60).optional(),
+    description: z.string().max(255).optional(),
+    city: z.string().max(60).optional(),
+    school: z.string().max(60).optional(),
+    work: z.string().max(60).optional(),
+    website: z.string().max(60).optional(),
+  });
+
+  const validatedFields = Profile.safeParse({ cover, ...filteredFields });  // Se validan los campos
+
+  if (!validatedFields.success) {                                           // Si la validación falla, se registran los errores en la consola 
+    console.log(validatedFields.error.flatten().fieldErrors);               // y se devuelve un objeto indicando el fracaso de la operación.
+    return { success: false, error: true };
+  }
+
+  const { userId } = auth();
+
+  if (!userId) {
+    return { success: false, error: true };
+  }
+
+  try {                                                                       
+    await prisma.user.update({                                              // actualizar el perfil del usuario en la base de datos utilizando prisma.user.update
+      where: {
+        id: userId,
+      },
+      data: validatedFields.data,
+    });
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
