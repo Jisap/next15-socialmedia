@@ -6,16 +6,17 @@ import { User } from '@prisma/client'
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { CldUploadWidget } from "next-cloudinary";
+import UpdateButton from './UpdateButton';
 
 const UpdateUser = ({ user }: { user: User }) => { // ProfilePage -> user -> RightMenu -> UserInfoCard -> info + updateUser component
 
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [cover, setCover] = useState<any>(false);
 
   // formAction -> updateProfile
   const [state, formAction] = useActionState(updateProfile, { success: false, error: false });  // Actualiza el estado según el resultado de una acción de formulario.
 
-  const router = useRouter();
 
   const handleClose = () => {
     setOpen(false);
@@ -164,9 +165,7 @@ const UpdateUser = ({ user }: { user: User }) => { // ProfilePage -> user -> Rig
               />
             </div>
 
-            <button className='bg-blue-500 p-2 mt-2 rounded-md text-white'>
-              Update
-            </button>
+            <UpdateButton />
 
             {state.success && (
               <span className="text-green-500">Profile has been updated!</span>

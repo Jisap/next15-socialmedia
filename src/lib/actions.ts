@@ -189,7 +189,7 @@ export const declineFollowRequest = async (userId: string) => {           // Fn 
 };
 
 export const updateProfile = async (
-  prevState: { success: boolean; error: boolean },
+  prevState: { success: boolean; error: boolean },                          // Estado anterior 
   payload: { formData: FormData; cover: string }                            // Data del formulario + cover
 ) => {
 
