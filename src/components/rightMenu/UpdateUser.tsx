@@ -168,6 +168,13 @@ const UpdateUser = ({ user }: { user: User }) => { // ProfilePage -> user -> Rig
               Update
             </button>
 
+            {state.success && (
+              <span className="text-green-500">Profile has been updated!</span>
+            )}
+            {state.error && (
+              <span className="text-red-500">Something went wrong!</span>
+            )}
+
             <div
               className="absolute text-xl right-2 top-3 cursor-pointer"
               onClick={handleClose}
