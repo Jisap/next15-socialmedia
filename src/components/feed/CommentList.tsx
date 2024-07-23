@@ -1,81 +1,140 @@
+"use client"
+
+import { addComment } from '@/lib/actions';
+import { useUser } from '@clerk/nextjs';
+import { Comment, User } from '@prisma/client';
 import Image from 'next/image'
-import React from 'react'
+import React, { useOptimistic, useState } from 'react'
 
-const CommentList = () => {
+type CommentWithUser = Comment & { user: User };
+
+const CommentList = ({
+  comments,
+  postId,
+}: {
+  comments: CommentWithUser[];
+  postId: number;
+}) => {
+
+  const { user } = useUser();                                     // Usuario logueado
+  const [commentState, setCommentState] = useState(comments);     // Estado de los commentarios
+  const [desc, setDesc] = useState("");                           // Estado para la descripción del nuevo comentario.                           
+
+  const add = async () => {                                       // Función que añade un comentario de manera optimista. 
+
+    if (!user || !desc) return;
+
+    addOptimisticComment({                                        // Añade un comentario con datos temporales mientras se espera la confirmación del servidor.
+      id: Math.random(),
+      desc,
+      createdAt: new Date(Date.now()),
+      updatedAt: new Date(Date.now()),
+      userId: user.id,
+      postId: postId,
+      user: {
+        id: user.id,
+        username: "Sending Please Wait...",
+        avatar: user.imageUrl || "/noAvatar.png",
+        cover: "",
+        description: "",
+        name: "",
+        surname: "",
+        city: "",
+        work: "",
+        school: "",
+        website: "",
+        createdAt: new Date(Date.now()),
+      },
+    });
+    try {
+      const createdComment = await addComment(postId, desc);      // Action que añade el comentario en bd
+      setCommentState((prev) => [createdComment, ...prev]);       // Añade el comentario nuevo al principio de la lista de comentarios
+    } catch (err) { }
+  };
+
+  const [optimisticComments, addOptimisticComment] = useOptimistic(       // Estado optimista
+    commentState,                                                         // Recibe el estado del comentario [comments]
+    (state, value: CommentWithUser) => [value, ...state]                  // y se hace lo mismo añadiendo el nuevo comentario al principio del array de comments
+  );
+
   return (
-    <div>
-      {/* WRITE */}
-      <div className='flex items-center gap-4'>
-        <Image 
-          src="https://images.pexels.com/photos/17685561/pexels-photo-17685561/free-photo-of-ligero-mar-ciudad-amanecer.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-          alt=""
-          width={32}
-          height={32}
-          className='w-8 h-8 rounded-full'
-        />
-        <div className='flex flex-1 items-center justify-between bg-slate-100 rounded-xl text-sm px-6 py-2 w-full'>
-          <input
-            type="text"
-            placeholder="Write a comment..."
-            className="bg-transparent outline-none flex-1"
-            //onChange={(e) => setDesc(e.target.value)}
-          />
+    <>
+      {user && (
+        <div className="flex items-center gap-4">
           <Image
-            src="/emoji.png"
+            src={user.imageUrl || "noAvatar.png"}
             alt=""
-            width={16}
-            height={16}
-            className="cursor-pointer"
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-full"
           />
+          <form
+            action={add}
+            className="flex-1 flex items-center justify-between bg-slate-100 rounded-xl text-sm px-6 py-2 w-full"
+          >
+            <input
+              type="text"
+              placeholder="Write a comment..."
+              className="bg-transparent outline-none flex-1"
+              onChange={(e) => setDesc(e.target.value)}
+            />
+            <Image
+              src="/emoji.png"
+              alt=""
+              width={16}
+              height={16}
+              className="cursor-pointer"
+            />
+          </form>
         </div>
-      </div>
-      {/* COMMENTS */}
+      )}
       <div className="">
-        {/* COMMENT*/}
-        <div className='flex gap-4 justify-between mt-6'>
-          {/* AVATAR */}
-          <Image
-            src="https://images.pexels.com/photos/17685561/pexels-photo-17685561/free-photo-of-ligero-mar-ciudad-amanecer.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-            alt=""
-            width={40}
-            height={40}
-            className='w-10 h-10 rounded-full'
-          />
-
-          {/* DESC */}
-          <div className='flex flex-col gap-2 flex-1'>
-            <span className='font-medium'>Juan R.R.</span>
-            <p>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ab, est! Quisquam repellat nemo vitae voluptatem explicabo 
-              consequatur cumque aut eaque ab. Nihil velit expedita beatae eligendi vel deleniti autem nulla!
-            </p>
-            <div className='flex items-center gap-8 text-xs text-gray-500 mt-2'>
-              <div className='flex items-center gap-4'>
-                <Image
-                  src="/like.png"
-                  alt=""
-                  width={12}
-                  height={12}
-                  className="cursor-pointer w-4 h-4"
-                />
-                <span className='text-gray-300'>|</span>
-                <span className='text-gray-500'>123 Likes</span>
+        {/* COMMENT */}
+        {optimisticComments.map((comment) => (
+          <div className="flex gap-4 justify-between mt-6" key={comment.id}>
+            {/* AVATAR */}
+            <Image
+              src={comment.user.avatar || "noAvatar.png"}
+              alt=""
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full"
+            />
+            {/* DESC */}
+            <div className="flex flex-col gap-2 flex-1">
+              <span className="font-medium">
+                {comment.user.name && comment.user.surname
+                  ? comment.user.name + " " + comment.user.surname
+                  : comment.user.username}
+              </span>
+              <p>{comment.desc}</p>
+              <div className="flex items-center gap-8 text-xs text-gray-500 mt-2">
+                <div className="flex items-center gap-4">
+                  <Image
+                    src="/like.png"
+                    alt=""
+                    width={12}
+                    height={12}
+                    className="cursor-pointer w-4 h-4"
+                  />
+                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-500">0 Likes</span>
+                </div>
+                <div className="">Reply</div>
               </div>
-              <div>Reply</div>
             </div>
+            {/* ICON */}
+            <Image
+              src="/more.png"
+              alt=""
+              width={16}
+              height={16}
+              className="cursor-pointer w-4 h-4"
+            ></Image>
           </div>
-
-          {/* ICON */}
-          <Image
-            src="/more.png"
-            alt=""
-            width={16}
-            height={16}
-            className="cursor-pointer w-4 h-4"
-          ></Image>
-        </div>
+        ))}
       </div>
-    </div>
+    </>
   )
 }
 

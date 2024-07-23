@@ -66,8 +66,10 @@ const Post = ({ post }: { post: FeedPostType }) => {
         />
       </Suspense>
 
-      <Suspense fallback="Loading...">
-        <Comments />
+      <Suspense fallback="Loading...">                    
+        <Comments 
+          postId={post.id}                                 // Id del post 
+        />                     
       </Suspense>
 
     </div>
