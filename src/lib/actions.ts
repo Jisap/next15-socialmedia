@@ -237,3 +237,56 @@ export const updateProfile = async (
     return { success: false, error: true };
   }
 };
+
+export const deletePost = async (postId: number) => {
+
+  const { userId } = auth();
+
+  if (!userId) throw new Error("User is not authenticated!");
+
+  try {
+    await prisma.post.delete({
+      where: {
+        id: postId,
+        userId,
+      },
+    });
+    revalidatePath("/")
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const switchLike = async (postId: number) => {            // Se recibe el id del post sobre el que se hace o no like
+
+  const { userId } = auth();                                     // Usuario logueado
+
+  if (!userId) throw new Error("User is not authenticated!");
+
+  try {
+    const existingLike = await prisma.like.findFirst({           // Obtenemos [like] correspondientes 
+      where: {
+        postId,                                                  // al id del post
+        userId,                                                  // y al usuario logueado que hace like o no
+      },
+    });
+
+    if (existingLike) {                                          // Si el [like] ya existía se borra
+      await prisma.like.delete({
+        where: {
+          id: existingLike.id,
+        },
+      });
+    } else {
+      await prisma.like.create({                                 // Si el [like] no existía se crea
+        data: {
+          postId,
+          userId,
+        },
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong");
+  }
+};
