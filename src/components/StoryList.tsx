@@ -73,7 +73,9 @@ const StoryList = ({
       >
         {({ open }) => {
           return (
-            <div className="flex flex-col items-center gap-2 cursor-pointer relative">
+            <div 
+              className="flex flex-col items-center gap-2 cursor-pointer relative"
+            >
               <Image
                 src={img?.secure_url || user?.imageUrl || "/noAvatar.png"}
                 alt=""
@@ -104,11 +106,11 @@ const StoryList = ({
           key={story.id}
         >
           <Image
-            src={story.user.avatar || "/noAvatar.png"}
+            src={story.img || "/noAvatar.png"}
             alt=""
             width={80}
             height={80}
-            className="w-20 h-20 rounded-full ring-2"
+            className="w-20 h-20 rounded-full ring-2 object-cover"
           />
           <span className="font-medium">
             {story.user.name || story.user.username}
