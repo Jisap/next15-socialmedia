@@ -6,7 +6,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
 
-export const addPost = async (formData: FormData, img: string) => { // Se reciben la desc y la imagen
+export const addPost = async (formData: FormData, img: string) => { // Se reciben la descripción y la imagen
 
   const desc = formData.get("desc") as string;                      // Se obtiene la descripción del formulario y se castea a string.
 
@@ -314,3 +314,4 @@ export const addComment = async (postId: number, desc: string) => {
     throw new Error("Something went wrong!");
   }
 };
+
